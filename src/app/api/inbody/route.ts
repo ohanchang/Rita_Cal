@@ -10,7 +10,10 @@ export const maxDuration = 60;
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { images } = body as { images: { base64: string; mimeType: string }[] };
+    const { images, hintText } = body as {
+      images: { base64: string; mimeType: string }[];
+      hintText?: string;
+    };
 
     if (!images || images.length === 0) {
       return NextResponse.json({ success: false, error: '請至少上傳一張 InBody 截圖' }, { status: 400 });
@@ -22,7 +25,7 @@ export async function POST(request: NextRequest) {
       mimeType: img.mimeType,
     }));
 
-    const data = await analyzeInBody(cleaned);
+    const data = await analyzeInBody(cleaned, hintText);
     return NextResponse.json({ success: true, data });
   } catch (error) {
     console.error('InBody 分析錯誤:', error);

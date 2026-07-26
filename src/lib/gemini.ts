@@ -338,8 +338,10 @@ export async function searchFood(query: string): Promise<FoodData> {
 // ==========================================
 
 /** 建立 InBody 解析 Prompt */
-function buildInBodyPrompt(): string {
+function buildInBodyPrompt(hintText?: string): string {
   return `你是一位專業的健康數據分析師。以下是使用者的 InBody 身體組成報告截圖（可能有多張），請仔細辨識所有數值。
+
+${hintText ? `## 輔助提示說明\n使用者提供了以下文字說明輔助判斷：「${hintText}」。\n請優先比對截圖數據，並參考此文字說明進行精確解析（例如補足日期、身高或特別備註說明）。\n` : ''}
 
 ## 回傳格式
 請嚴格以 JSON 格式回傳，不要包含 markdown 標記或其他文字：
@@ -399,13 +401,14 @@ function buildInBodyPrompt(): string {
 
 /** 分析 InBody 截圖 (支援多圖) */
 export async function analyzeInBody(
-  images: { base64: string; mimeType: string }[]
+  images: { base64: string; mimeType: string }[],
+  hintText?: string
 ): Promise<InBodyData> {
   const apiKeyString = process.env.GEMINI_API_KEY;
   if (!apiKeyString) throw new Error('GEMINI_API_KEY 未設定');
 
   const apiKeys = apiKeyString.split(',').map(k => k.trim()).filter(Boolean);
-  const prompt = buildInBodyPrompt();
+  const prompt = buildInBodyPrompt(hintText);
   let lastError: Error | null = null;
 
   for (const apiKey of apiKeys) {

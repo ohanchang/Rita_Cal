@@ -30,6 +30,7 @@ async function compressImage(dataUrl: string, maxDim = 1200, quality = 0.7): Pro
 
 export default function InBodyPage() {
   const [images, setImages] = useState<{ dataUrl: string; mimeType: string }[]>([]);
+  const [hintText, setHintText] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [result, setResult] = useState<InBodyData | null>(null);
@@ -75,7 +76,10 @@ export default function InBodyPage() {
       const res = await fetch("/api/inbody", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ images: images.map(img => ({ base64: img.dataUrl, mimeType: img.mimeType })) }),
+        body: JSON.stringify({
+          images: images.map(img => ({ base64: img.dataUrl, mimeType: img.mimeType })),
+          hintText: hintText.trim(),
+        }),
       });
       if (!res.ok) { toast.error(`伺服器錯誤 (${res.status})`); return; }
       const json = await res.json();
@@ -161,9 +165,35 @@ export default function InBodyPage() {
       <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleFileSelect} style={{ display: "none" }} />
 
       {!result && (
-        <button className="btn btn-primary btn-lg" style={{ width: "100%", marginBottom: "var(--spacing-md)" }} onClick={handleAnalyze} disabled={images.length === 0 || loading}>
-          {loading ? (<><span className="spinner" style={{ width: "18px", height: "18px" }} /> AI 分析中...</>) : (`🤖 開始 AI 分析 (${images.length} 張)`)}
-        </button>
+        <div style={{ marginBottom: "var(--spacing-md)" }}>
+          <button
+            className="btn btn-primary btn-lg"
+            style={{ width: "100%", marginBottom: "var(--spacing-sm)" }}
+            onClick={handleAnalyze}
+            disabled={images.length === 0 || loading}
+          >
+            {loading ? (
+              <><span className="spinner" style={{ width: "18px", height: "18px" }} /> AI 分析中...</>
+            ) : (
+              `🤖 開始 AI 分析 (${images.length} 張)`
+            )}
+          </button>
+
+          {/* 綠色框位置：文字說明 / 備註（作為 AI 判斷參考） */}
+          <div className="card" style={{ padding: "var(--spacing-sm) var(--spacing-md)" }}>
+            <label className="label" style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--text-secondary)", marginBottom: 4, display: "flex", alignItems: "center", gap: 4 }}>
+              <span>📝</span>
+              <span>文字說明 / 備註（選填，作為 AI 判斷參考）</span>
+            </label>
+            <input
+              className="input"
+              value={hintText}
+              onChange={(e) => setHintText(e.target.value)}
+              placeholder="例如：檢測日期 2026/07/16、身高 175cm..."
+              style={{ fontSize: "0.85rem" }}
+            />
+          </div>
+        </div>
       )}
 
       {loading && (

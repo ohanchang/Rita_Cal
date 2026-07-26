@@ -2,6 +2,12 @@
 
 此檔案記錄本次 Food Calories Tracker 專案所有針對 UI 視覺品質、資料讀取流暢性與延伸功能的優化歷程。
 
+## 🚀 v1.2 InBody AI 輔助文字說明功能（2026-07-26）
+* **檔案**：`src/app/inbody/page.tsx`, `src/app/api/inbody/route.ts`, `src/lib/gemini.ts`
+* **優化做法**：
+  * 新增 InBody 文字說明/備註輸入框（選填），讓使用者可於上傳截圖時輸入補足資訊（如日期、身高或受傷水腫特別備註）。
+  * 更新 `POST /api/inbody` 與 Gemini Prompt，引導 AI 將使用者輸入的文字作為關鍵輔助參考數據進行精確辨識與解析。
+
 ## 🛠️ 變更項目詳解
 
 ### 1. 拍照分析後的備註欄位不足與歷史回溯
