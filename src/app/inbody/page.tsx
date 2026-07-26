@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { InBodyData, InBodyRecord } from "@/lib/types";
+import { InBodyData, InBodyRecord, APP_VERSION } from "@/lib/types";
 import toast from "react-hot-toast";
 import InBodyHistoryTable from "@/components/InBodyHistoryTable";
 import { fv, SegmentalDiagram, barPercent } from "@/components/InBodyVisuals";
@@ -124,7 +124,12 @@ export default function InBodyPage() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1 className="page-title">🏋️ InBody 分析</h1>
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--spacing-xs)" }}>
+          <h1 className="page-title">🏋️ InBody 分析</h1>
+          <span className="badge" style={{ background: "rgba(0, 184, 148, 0.15)", color: "var(--color-success)", fontSize: "0.75rem", padding: "2px 8px", borderRadius: "var(--radius-full)" }}>
+            {APP_VERSION}
+          </span>
+        </div>
       </div>
 
       {/* === Upload area === */}

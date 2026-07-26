@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AppSettings, DEFAULT_SETTINGS, Gender, ActivityLevel, FitnessGoal, ACTIVITY_LEVELS, FITNESS_GOALS, InBodyRecord } from "@/lib/types";
+import { AppSettings, DEFAULT_SETTINGS, Gender, ActivityLevel, FitnessGoal, ACTIVITY_LEVELS, FITNESS_GOALS, InBodyRecord, APP_VERSION } from "@/lib/types";
 import { getSettings, saveSettings, getDailyTargets, calculateBMR, calculateTDEE, getRecommendedCalories } from "@/lib/settings";
 import { isDemoMode, setDemoMode, setNotionConfigured } from "@/lib/demo-mode";
 import { useRecords } from "@/lib/useRecords";
@@ -82,7 +82,12 @@ export default function SettingsPage() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1 className="page-title">⚙️ 設定</h1>
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--spacing-xs)" }}>
+          <h1 className="page-title">⚙️ 設定</h1>
+          <span className="badge" style={{ background: "var(--color-bg)", border: "1px solid var(--border-color)", color: "var(--text-secondary)", fontSize: "0.75rem", padding: "2px 8px", borderRadius: "var(--radius-full)" }}>
+            {APP_VERSION}
+          </span>
+        </div>
         {saved && (
           <span className="badge" style={{ background: "rgba(0, 184, 148, 0.2)", color: "var(--color-success)" }}>
             ✓ 已儲存
@@ -429,6 +434,10 @@ export default function SettingsPage() {
             📥 下載 CSV
           </button>
         </div>
+      </div>
+
+      <div style={{ textAlign: "center", margin: "var(--spacing-lg) 0 var(--spacing-md)", fontSize: "0.8rem", color: "var(--text-muted)" }}>
+        Food Calories Tracker {APP_VERSION}
       </div>
 
     </div>

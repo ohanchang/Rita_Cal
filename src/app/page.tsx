@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AppSettings, DEFAULT_SETTINGS } from "@/lib/types";
+import { AppSettings, DEFAULT_SETTINGS, APP_VERSION } from "@/lib/types";
 import { getSettings, getDailyTargets } from "@/lib/settings";
 import { isDemoMode } from "@/lib/demo-mode";
 import { useRecords } from "@/lib/useRecords";
@@ -52,7 +52,12 @@ export default function Dashboard() {
     <div className="page-container">
       {/* Header */}
       <div className="page-header">
-        <h1 className="page-title">🍽️ 卡路里追蹤</h1>
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--spacing-xs)" }}>
+          <h1 className="page-title">🍽️ 卡路里追蹤</h1>
+          <span className="badge" style={{ background: "var(--color-bg)", border: "1px solid var(--border-color)", color: "var(--text-secondary)", fontSize: "0.75rem", padding: "2px 8px", borderRadius: "var(--radius-full)" }}>
+            {APP_VERSION}
+          </span>
+        </div>
         <div style={{ display: "flex", alignItems: "center", gap: "var(--spacing-sm)" }}>
           {demo && (
             <span className="badge" style={{ background: "rgba(253, 203, 110, 0.2)", color: "#f39c12" }}>

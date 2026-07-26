@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { isDemoMode } from "@/lib/demo-mode";
 import { MOCK_FOOD_RECORDS } from "@/lib/mock-data";
-import { SCALE_REFERENCES } from "@/lib/types";
+import { SCALE_REFERENCES, APP_VERSION } from "@/lib/types";
 import exifr from "exifr";
 
 function formatFileSize(bytes: number): string {
@@ -259,7 +259,12 @@ export default function ScanPage() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1 className="page-title">📸 拍照辨識</h1>
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--spacing-xs)" }}>
+          <h1 className="page-title">📸 拍照辨識</h1>
+          <span className="badge" style={{ background: "var(--color-bg)", border: "1px solid var(--border-color)", color: "var(--text-secondary)", fontSize: "0.75rem", padding: "2px 8px", borderRadius: "var(--radius-full)" }}>
+            {APP_VERSION}
+          </span>
+        </div>
       </div>
 
       {/* 掃描模式切換 */}
