@@ -2,11 +2,11 @@
 
 此檔案記錄本次 Food Calories Tracker 專案所有針對 UI 視覺品質、資料讀取流暢性與延伸功能的優化歷程。
 
-## 🚀 v1.2 InBody AI 輔助文字說明功能（2026-07-26）
-* **檔案**：`src/app/inbody/page.tsx`, `src/app/api/inbody/route.ts`, `src/lib/gemini.ts`
+## 🚀 v1.2 InBody AI 輔助文字說明與 UI 版本標示功能（2026-07-26）
+* **檔案**：`src/app/inbody/page.tsx`, `src/app/api/inbody/route.ts`, `src/lib/gemini.ts`, `src/lib/types.ts`, `src/app/page.tsx`, `src/app/scan/page.tsx`, `src/app/settings/page.tsx`
 * **優化做法**：
-  * 新增 InBody 文字說明/備註輸入框（選填），讓使用者可於上傳截圖時輸入補足資訊（如日期、身高或受傷水腫特別備註）。
-  * 更新 `POST /api/inbody` 與 Gemini Prompt，引導 AI 將使用者輸入的文字作為關鍵輔助參考數據進行精確辨識與解析。
+  * **InBody AI 輔助文字說明**：在上傳區域下方新增文字說明/備註輸入框（選填），讓使用者可於上傳截圖時補足背景資訊（如檢測日期、身高或受傷水腫特別備註）。更新 `POST /api/inbody` 與 Gemini Prompt，引導 AI 將使用者輸入的文字作為關鍵輔助參考數據進行精確辨識與解析。
+  * **UI 版本標記 (Version Badges)**：在全站核心頁面 Header（首頁 `🍽️ 卡路里追蹤`、InBody `🏋️ InBody 分析`、拍照辨識 `📸 拍照辨識`、設定 `⚙️ 設定`）與設定頁腳新增 `v1.2` 標籤，讓使用者可直觀確認當前部署版號與新功能上線狀態。
 
 ## 🛠️ 變更項目詳解
 
