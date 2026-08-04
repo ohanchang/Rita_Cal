@@ -467,7 +467,7 @@ export async function createMounjaroRecord(date: string, dose: number): Promise<
   const response = await notion.pages.create({
     parent: { database_id: databaseId },
     properties: {
-      'Name': { title: [{ text: { content: '猛健樂施打' } }] },
+      'Name ': { title: [{ text: { content: '猛健樂施打' } }] },
       'Date': { date: { start: date } },
       'Dose': { number: dose },
     },
