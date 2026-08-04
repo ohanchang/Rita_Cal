@@ -1,5 +1,16 @@
 # 開發變更紀錄 (log.md)
 
+# 專案開發日誌 (Food Cal Tracker)
+
+## 2026/08/04 - v1.4 Mounjaro (GLP-1) 互動式日曆追蹤
+- **月曆追蹤介面**：將原先的單純按鈕升級為互動式月曆，使用者可直接點選日期紀錄施打，並利用長按觸發刪除防誤觸。
+- **修復 Notion 整合錯誤**：修正因資料庫欄位尾隨空白 (Trailing space) 造成的排序查詢 (Sort API) `400 Bad Request` 錯誤。
+
+## 2026/08/04 - v1.3 Mounjaro (GLP-1) 施打紀錄與 InBody 分析整合
+- **新增 GLP-1 藥物紀錄介面**：在 InBody 分析頁面加入快速紀錄按鈕（2.5mg, 5.0mg, 7.5mg），並自動同步至獨立 Notion Database。
+- **AI 解析強化**：在傳送 InBody 數據給 Gemini 解析時，將自動注入最近 5 次的 Mounjaro 施打紀錄，強制要求 AI 監測「除脂體重 (Lean Body Mass)」流失情況，以防範 GLP-1 副作用引發之肌少症。
+- **修正 InBody 備註解析錯誤**：調整 AI Prompt，使其在辨識截圖遺漏數值時，優先採用使用者提供的備註說明，不再強制回傳 null。
+
 此檔案記錄本次 Food Calories Tracker 專案所有針對 UI 視覺品質、資料讀取流暢性與延伸功能的優化歷程。
 
 ## 🚀 v1.2 InBody AI 輔助文字說明與 UI 版本標示功能（2026-07-26）
@@ -112,3 +123,5 @@
 * **做法**：
   * 透過 `sessionStorage` 傳遞 `scanMode` 參數。
   * 在 `/scan/confirm` 頁面頂端加入專屬提示 Banner，明確提醒使用者「已使用餐前與餐後照片比對分析，以下數值為實際攝取量」。
+
+- v1.4: 新增 Mounjaro 互動式日曆追蹤、長按刪除功能、修復 Notion 欄位空白字元問題

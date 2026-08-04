@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { FoodRecord, InBodyRecord, AppSettings as Settings } from "./types";
+import { FoodRecord, InBodyRecord, AppSettings as Settings, MounjaroRecord } from "./types";
 
 /** 快取有效期 (ms) — 30 秒內不重複請求 Notion */
 export const RECORDS_TTL_MS = 30_000;
@@ -32,6 +32,9 @@ interface AppState {
   removeFoodOptimistic: (id: string) => void;
   updateFoodOptimistic: (id: string, updates: Partial<FoodRecord>) => void;
   setInBodyRecords: (records: InBodyRecord[]) => void;
+  mounjaroRecords: MounjaroRecord[];
+  setMounjaroRecords: (records: MounjaroRecord[]) => void;
+  addMounjaroOptimistic: (record: MounjaroRecord) => void;
   setSettings: (settings: Settings) => void;
   addFavorite: (item: Omit<FavoriteItem, "savedAt">) => void;
   removeFavorite: (id: string) => void;
@@ -44,6 +47,7 @@ export const useAppStore = create<AppState>()(
     (set, get) => ({
       foodRecords: [],
       inbodyRecords: [],
+      mounjaroRecords: [],
       favorites: [],
       settings: null,
       recordsLoaded: false,
@@ -70,6 +74,13 @@ export const useAppStore = create<AppState>()(
         })),
 
       setInBodyRecords: (records) => set({ inbodyRecords: records }),
+
+      setMounjaroRecords: (records) => set({ mounjaroRecords: records }),
+
+      addMounjaroOptimistic: (record) =>
+        set((state) => ({
+          mounjaroRecords: [record, ...state.mounjaroRecords].sort((a, b) => b.date.localeCompare(a.date)),
+        })),
 
       setSettings: (settings) => set({ settings }),
 

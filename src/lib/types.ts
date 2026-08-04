@@ -2,7 +2,7 @@
 // 食物辨識相關型別與版本號
 // ==========================================
 
-export const APP_VERSION = "v1.2";
+export const APP_VERSION = "v1.4";
 
 /** 單一食物品項 */
 export interface FoodItem {
@@ -322,6 +322,20 @@ export interface InBodyData {
 /** Notion 中的 InBody 紀錄 */
 export interface InBodyRecord extends InBodyData {
   id: string;
+  createdAt: string;
+}
+
+// ==========================================
+// 藥物紀錄 (Mounjaro)
+// ==========================================
+
+/** 猛健樂 (Mounjaro/Tirzepatide) 施打紀錄 */
+export interface MounjaroRecord {
+  id: string;
+  /** 施打日期 YYYY-MM-DD */
+  date: string;
+  /** 劑量 (mg) */
+  dose: number;
   createdAt: string;
 }
 

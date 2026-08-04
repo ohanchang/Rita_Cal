@@ -2,10 +2,11 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { InBodyData, InBodyRecord, APP_VERSION } from "@/lib/types";
+import { InBodyData, InBodyRecord, MounjaroRecord, APP_VERSION } from "@/lib/types";
 import toast from "react-hot-toast";
 import InBodyHistoryTable from "@/components/InBodyHistoryTable";
 import { fv, SegmentalDiagram, barPercent } from "@/components/InBodyVisuals";
+import MounjaroCalendar from "@/components/MounjaroCalendar";
 
 /** Compress image for upload */
 async function compressImage(dataUrl: string, maxDim = 1200, quality = 0.7): Promise<string> {
@@ -35,6 +36,8 @@ export default function InBodyPage() {
   const [saving, setSaving] = useState(false);
   const [result, setResult] = useState<InBodyData | null>(null);
   const [records, setRecords] = useState<InBodyRecord[]>([]);
+  const [mRecords, setMRecords] = useState<MounjaroRecord[]>([]);
+  const [mSaving, setMSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
@@ -43,7 +46,53 @@ export default function InBodyPage() {
       .then(r => r.json())
       .then(json => { if (json.success && json.data.length > 0) setRecords(json.data); })
       .catch(() => {});
+      
+    fetch("/api/mounjaro")
+      .then(r => r.json())
+      .then(json => { if (json.success && json.data.length > 0) setMRecords(json.data); })
+      .catch(() => {});
   }, []);
+
+  async function handleMounjaroRecord(dose: number) {
+    setMSaving(true);
+    try {
+      const date = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Taipei" });
+      const res = await fetch("/api/mounjaro", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date, dose })
+      });
+      const json = await res.json();
+      if (json.success) {
+        toast.success(`已記錄今日施打 ${dose}mg`);
+        setMRecords([{ id: json.data.id, date, dose, createdAt: new Date().toISOString() }, ...mRecords].sort((a, b) => b.date.localeCompare(a.date)));
+      } else {
+        toast.error(json.error || "紀錄失敗");
+      }
+    } catch (e) {
+      toast.error("紀錄過程發生錯誤");
+    } finally {
+      setMSaving(false);
+    }
+  }
+
+  async function handleDeleteMounjaroRecord(id: string) {
+    setMSaving(true);
+    try {
+      const res = await fetch(`/api/mounjaro?id=${id}`, { method: "DELETE" });
+      const json = await res.json();
+      if (json.success) {
+        toast.success("已刪除紀錄");
+        setMRecords(mRecords.filter(r => r.id !== id));
+      } else {
+        toast.error(json.error || "刪除失敗");
+      }
+    } catch (e) {
+      toast.error("刪除過程發生錯誤");
+    } finally {
+      setMSaving(false);
+    }
+  }
 
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
@@ -132,6 +181,37 @@ export default function InBodyPage() {
         </div>
       </div>
 
+      {/* 猛健樂日曆追蹤區塊 */}
+      <MounjaroCalendar
+        records={mRecords}
+        onAddRecord={(date, dose) => {
+          // The old handler used today's date, we modify it to accept date from calendar
+          setMSaving(true);
+          fetch("/api/mounjaro", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ date, dose })
+          })
+          .then(r => r.json())
+          .then(json => {
+            if (json.success) {
+              toast.success(`已記錄 ${date} 施打 ${dose}mg`);
+              // Check if record already exists on this date to replace or add
+              setMRecords(prev => {
+                const filtered = prev.filter(r => r.date !== date);
+                return [{ id: json.data.id, date, dose, createdAt: new Date().toISOString() }, ...filtered].sort((a, b) => b.date.localeCompare(a.date));
+              });
+            } else {
+              toast.error(json.error || "紀錄失敗");
+            }
+          })
+          .catch(() => toast.error("紀錄過程發生錯誤"))
+          .finally(() => setMSaving(false));
+        }}
+        onDeleteRecord={handleDeleteMounjaroRecord}
+        isLoading={mSaving}
+      />
+
       {/* === Upload area === */}
       <div
         className="card"
@@ -171,21 +251,8 @@ export default function InBodyPage() {
 
       {!result && (
         <div style={{ marginBottom: "var(--spacing-md)" }}>
-          <button
-            className="btn btn-primary btn-lg"
-            style={{ width: "100%", marginBottom: "var(--spacing-sm)" }}
-            onClick={handleAnalyze}
-            disabled={images.length === 0 || loading}
-          >
-            {loading ? (
-              <><span className="spinner" style={{ width: "18px", height: "18px" }} /> AI 分析中...</>
-            ) : (
-              `🤖 開始 AI 分析 (${images.length} 張)`
-            )}
-          </button>
-
           {/* 綠色框位置：文字說明 / 備註（作為 AI 判斷參考） */}
-          <div className="card" style={{ padding: "var(--spacing-sm) var(--spacing-md)" }}>
+          <div className="card" style={{ padding: "var(--spacing-sm) var(--spacing-md)", marginBottom: "var(--spacing-md)" }}>
             <label className="label" style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--text-secondary)", marginBottom: 4, display: "flex", alignItems: "center", gap: 4 }}>
               <span>📝</span>
               <span>文字說明 / 備註（選填，作為 AI 判斷參考）</span>
@@ -198,6 +265,19 @@ export default function InBodyPage() {
               style={{ fontSize: "0.85rem" }}
             />
           </div>
+
+          <button
+            className="btn btn-primary btn-lg"
+            style={{ width: "100%", marginBottom: "var(--spacing-sm)" }}
+            onClick={handleAnalyze}
+            disabled={images.length === 0 || loading}
+          >
+            {loading ? (
+              <><span className="spinner" style={{ width: "18px", height: "18px" }} /> AI 分析中...</>
+            ) : (
+              `🤖 開始 AI 分析 (${images.length} 張)`
+            )}
+          </button>
         </div>
       )}
 

@@ -25,7 +25,19 @@ export async function POST(request: NextRequest) {
       mimeType: img.mimeType,
     }));
 
-    const data = await analyzeInBody(cleaned, hintText);
+    let mounjaroContext = '';
+    try {
+      const { getAllMounjaroRecords } = await import('@/lib/notion');
+      const mRecords = await getAllMounjaroRecords();
+      if (mRecords.length > 0) {
+        const recent = mRecords.slice(0, 10).map(r => `${r.date}: ${r.dose}mg`).join(', ');
+        mounjaroContext = `使用者目前正在施打猛健樂 (Tirzepatide)，最近幾次的施打紀錄為：${recent}。`;
+      }
+    } catch (e) {
+      console.error('Failed to load Mounjaro context for AI:', e);
+    }
+
+    const data = await analyzeInBody(cleaned, hintText, mounjaroContext);
     return NextResponse.json({ success: true, data });
   } catch (error) {
     console.error('InBody 分析錯誤:', error);

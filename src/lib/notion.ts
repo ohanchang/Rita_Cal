@@ -1,5 +1,5 @@
 import { Client } from '@notionhq/client';
-import { FoodData, FoodRecord, InBodyData, InBodyRecord } from './types';
+import { FoodData, FoodRecord, InBodyData, InBodyRecord, MounjaroRecord } from './types';
 
 /** 取得 Notion Token */
 function getToken(): string {
@@ -408,6 +408,87 @@ export async function deleteInBodyRecord(pageId: string): Promise<void> {
 // ==========================================
 // 附加 AI 建議
 // ==========================================
+
+// ==========================================
+// Mounjaro 紀錄 CRUD
+// ==========================================
+
+function getMounjaroDatabaseId(): string {
+  const id = process.env.NOTION_MOUNJARO_DATABASE_ID?.trim();
+  if (!id) throw new Error('NOTION_MOUNJARO_DATABASE_ID 未設定');
+  return id;
+}
+
+export async function getAllMounjaroRecords(): Promise<MounjaroRecord[]> {
+  const databaseId = getMounjaroDatabaseId();
+  const records: MounjaroRecord[] = [];
+  let hasMore = true;
+  let cursor: string | undefined = undefined;
+
+  while (hasMore) {
+    const rawRes: any = await fetch(`https://api.notion.com/v1/databases/${databaseId}/query`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${getToken()}`,
+        'Notion-Version': '2022-06-28',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        page_size: 100,
+        sorts: [{ property: 'Date', direction: 'descending' }],
+        ...(cursor ? { start_cursor: cursor } : {}),
+      }),
+    });
+
+    if (!rawRes.ok) {
+      const errorText = await rawRes.text();
+      throw new Error(`Notion Mounjaro API 錯誤 (${rawRes.status}): ${errorText}`);
+    }
+
+    const response: any = await rawRes.json();
+    for (const page of response.results) {
+      records.push({
+        id: page.id,
+        date: getPropertyValue(page.properties['Date'], 'date'),
+        dose: getPropertyValue(page.properties['Dose'], 'number'),
+        createdAt: page.created_time,
+      });
+    }
+    hasMore = response.has_more;
+    cursor = response.next_cursor ?? undefined;
+  }
+  return records;
+}
+
+export async function createMounjaroRecord(date: string, dose: number): Promise<string> {
+  const notion = getNotionClient();
+  const databaseId = getMounjaroDatabaseId();
+
+  const response = await notion.pages.create({
+    parent: { database_id: databaseId },
+    properties: {
+      'Name': { title: [{ text: { content: '猛健樂施打' } }] },
+      'Date': { date: { start: date } },
+      'Dose': { number: dose },
+    },
+  });
+
+  return response.id;
+}
+
+export async function deleteMounjaroRecord(id: string): Promise<boolean> {
+  const notion = getNotionClient();
+  try {
+    await notion.pages.update({
+      page_id: id,
+      archived: true,
+    });
+    return true;
+  } catch (error) {
+    console.error('刪除 Mounjaro 紀錄錯誤:', error);
+    return false;
+  }
+}
 
 /** 將 AI 飲食建議儲存至該次 InBody 的頁面內文 */
 export async function appendAdviceToInBodyPage(pageId: string, markdownText: string): Promise<void> {

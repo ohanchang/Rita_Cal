@@ -338,10 +338,11 @@ export async function searchFood(query: string): Promise<FoodData> {
 // ==========================================
 
 /** 建立 InBody 解析 Prompt */
-function buildInBodyPrompt(hintText?: string): string {
+function buildInBodyPrompt(hintText?: string, mounjaroContext?: string): string {
   return `你是一位專業的健康數據分析師。以下是使用者的 InBody 身體組成報告截圖（可能有多張），請仔細辨識所有數值。
 
 ${hintText ? `## 輔助提示說明\n使用者提供了以下文字說明輔助判斷：「${hintText}」。\n請優先比對截圖數據，並參考此文字說明進行精確解析（例如補足日期、身高或特別備註說明）。\n` : ''}
+${mounjaroContext ? `## 特別背景資訊 (GLP-1 藥物)\n${mounjaroContext}\n請嚴格監控使用者的除脂體重 (Lean Body Mass) 與骨骼肌重，因為 GLP-1 藥物（如猛健樂）可能導致肌肉流失。請在 warnings 陣列中，評估其肌肉流失情況（對比體脂下降幅度），並給予對應的蛋白質與重訓建議（簡潔的一句話即可）。\n` : ''}
 
 ## 回傳格式
 請嚴格以 JSON 格式回傳，不要包含 markdown 標記或其他文字：
@@ -385,7 +386,7 @@ ${hintText ? `## 輔助提示說明\n使用者提供了以下文字說明輔助�
 }
 
 ## 辨識規則
-1. 所有數值欄位如果在截圖中**看不到或無法辨識**，該欄位請回傳 null（不要猜測或填 0）
+1. 所有數值欄位優先以截圖內容為主。如果在截圖中**看不到或無法辨識**，請檢查「輔助提示說明」中是否有提供相關資訊（例如使用者自填的檢測日期），若有則採用該資訊；若兩者皆無，才回傳 null（不要猜測或填 0）。
 2. 檢查截圖是否包含以下區塊，如果缺少任何區塊，請在 warnings 中提醒：
    - InBody 評分（含檢測日期）
    - 身體組成（水重、蛋白質、礦物質、體脂肪）
@@ -402,13 +403,14 @@ ${hintText ? `## 輔助提示說明\n使用者提供了以下文字說明輔助�
 /** 分析 InBody 截圖 (支援多圖) */
 export async function analyzeInBody(
   images: { base64: string; mimeType: string }[],
-  hintText?: string
+  hintText?: string,
+  mounjaroContext?: string
 ): Promise<InBodyData> {
   const apiKeyString = process.env.GEMINI_API_KEY;
   if (!apiKeyString) throw new Error('GEMINI_API_KEY 未設定');
 
   const apiKeys = apiKeyString.split(',').map(k => k.trim()).filter(Boolean);
-  const prompt = buildInBodyPrompt(hintText);
+  const prompt = buildInBodyPrompt(hintText, mounjaroContext);
   let lastError: Error | null = null;
 
   for (const apiKey of apiKeys) {
@@ -538,3 +540,4 @@ export async function analyzeDiet(
   }
   throw new Error(`飲食分析失敗。最後錯誤: ${lastError?.message}`);
 }
+
