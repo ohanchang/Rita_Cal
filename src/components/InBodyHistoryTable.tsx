@@ -45,7 +45,7 @@ export default function InBodyHistoryTable({ records }: Props) {
   const renderRow = (label: string, unit: string, key: keyof InBodyRecord, invertGood: boolean = false) => {
     return (
       <tr style={{ borderBottom: "1px solid var(--border-color)" }}>
-        <td style={{ padding: "12px 16px", fontWeight: 600, color: "var(--text-primary)", fontSize: "0.85rem" }}>
+        <td style={{ position: "sticky", left: 0, zIndex: 1, backgroundColor: "var(--color-bg)", boxShadow: "2px 0 5px -2px rgba(0,0,0,0.1)", padding: "12px 16px", fontWeight: 600, color: "var(--text-primary)", fontSize: "0.85rem" }}>
           {label} <span style={{ color: "var(--text-muted)", fontSize: "0.75rem", fontWeight: 400 }}>({unit})</span>
         </td>
         {displayRecords.map((rec, i) => {
@@ -81,7 +81,7 @@ export default function InBodyHistoryTable({ records }: Props) {
         <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 500 }}>
           <thead>
             <tr style={{ background: "rgba(163, 177, 198, 0.1)" }}>
-              <th style={{ padding: "12px 16px", textAlign: "left", color: "var(--text-secondary)", fontSize: "0.8rem", fontWeight: 500, width: 140 }}>
+              <th style={{ position: "sticky", left: 0, zIndex: 2, backgroundColor: "#f3f5f8", boxShadow: "2px 0 5px -2px rgba(0,0,0,0.1)", padding: "12px 16px", textAlign: "left", color: "var(--text-secondary)", fontSize: "0.8rem", fontWeight: 500, width: 140 }}>
                 檢測日期
               </th>
               {displayRecords.map(rec => (

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { analyzeDiet } from '@/lib/gemini';
-import { getAllInBodyRecords, getAllFoodRecords, appendAdviceToInBodyPage } from '@/lib/notion';
+import { getAllInBodyRecords, getAllFoodRecords, getAllMounjaroRecords, appendAdviceToInBodyPage } from '@/lib/notion';
 import { isRateLimited } from '@/lib/rate-limit';
 
 /** POST — AI 交叉分析飲食與 InBody 數據 */
@@ -31,14 +31,19 @@ export async function POST(request: NextRequest) {
     const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     const recentRecords = allFoodRecords.filter(r => r.date >= cutoff);
 
-    // 呼叫 Gemini 做飲食交叉分析
-    const analysis = await analyzeDiet(latestInBody, recentRecords, period);
+    // 取得猛健樂紀錄 (取最近 10 次)
+    const mRecords = await getAllMounjaroRecords();
+    const recentMRecords = mRecords.slice(0, 10);
+
+    // 呼叫 Gemini 做多維度交叉分析
+    const analysis = await analyzeDiet(latestInBody, recentRecords, recentMRecords, period);
 
     // 背景寫入 Notion (Fire and forget)
     // 我們將 AI 分析報告儲存在最新一筆 InBody 紀錄的頁面 Block 內
     if (latestInBody.id) {
       appendAdviceToInBodyPage(latestInBody.id, [
         `總結: ${analysis.summary}`,
+        analysis.mounjaroAssessment ? `GLP-1 綜合評估: ${analysis.mounjaroAssessment}` : '',
         `熱量評估: ${analysis.calorieAssessment}`,
         `營養素評估: ${analysis.macroAssessment}`,
         `優點: ${analysis.strengths.join('、')}`,

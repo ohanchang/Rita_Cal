@@ -1,127 +1,79 @@
-# 開發變更紀錄 (log.md)
+# ?�發變更紀??(log.md)
 
-# 專案開發日誌 (Food Cal Tracker)
+# 專�??�發?��? (Food Cal Tracker)
 
-## 2026/08/04 - v1.4 Mounjaro (GLP-1) 互動式日曆追蹤
-- **月曆追蹤介面**：將原先的單純按鈕升級為互動式月曆，使用者可直接點選日期紀錄施打，並利用長按觸發刪除防誤觸。
-- **修復 Notion 整合錯誤**：修正因資料庫欄位尾隨空白 (Trailing space) 造成的排序查詢 (Sort API) `400 Bad Request` 錯誤。
+## 2026/08/05 - v1.5 AI �h���פ��R�P����� UX �u��
+- **InBody ���v�ƾڤ�����u��**�G������[�J�u�ᵲ���� (Sticky Header)�v�P�u�ʳ��v�A�j�T�ﵽ�b����p�ù��W��V�ưʬd�ݼƾڮɡA���װg�����x�Z�C
+- **AI �ɯŬ���A�U��**�G�N�uAI ������ĳ�v���s�R�W���uAI ���R��ĳ�v�C
+- **GLP-1 �h���׺�X����**�G�b���q�����϶��e�A�s�W�M�ݪ� GLP-1 ��X���� (Mounjaro) ���R���G�CAI �|�D�������������Ĭ����A�N���q�B�W�v�P InBody ���u���ܤơ]�魫/�٦׬y���^�Ϊ���������q�ʤf�i�����p���R�C
+## 2026/08/04 - v1.4 Mounjaro (GLP-1) 互�?式日?�追�?- **?��?追蹤介面**：�??��??�單純�??��?級為互�?式�??��?使用?�可?�接點選?��?紀?�施?��?並利?�長?�觸?�刪?�防誤觸??- **修復 Notion ?��??�誤**：修�??資�?庫�?位尾?�空??(Trailing space) ?��??��?序查�?(Sort API) `400 Bad Request` ?�誤??
+## 2026/08/04 - v1.3 Mounjaro (GLP-1) ?��?紀?��? InBody ?��??��?
+- **?��? GLP-1 ?�物紀?��???*：在 InBody ?��??�面?�入快速�??��??��?2.5mg, 5.0mg, 7.5mg）�?並自?��?步至?��? Notion Database??- **AI �??強�?**：在?��?InBody ?��?�?Gemini �???��?將自?�注?��?�?5 次�? Mounjaro ?��?紀?��?強制要�? AI ??��?�除?��???(Lean Body Mass)?��?失�?況�?以防�?GLP-1 ?��??��??��??��??��?- **修正 InBody ?�註�???�誤**：調??AI Prompt，使?�在辨�??��??��??�值�?，優?�採?�使?�者�?供�??�註說�?，�??�強?��???null??
+此�?案�??�本�?Food Calories Tracker 專�??�?��?�?UI 視覺?�質?��??��??��??�性�?延伸?�能?�優?�歷程�?
+## ?? v1.2 InBody AI 輔助?��?說�???UI ?�本標示?�能�?026-07-26�?* **檔�?**：`src/app/inbody/page.tsx`, `src/app/api/inbody/route.ts`, `src/lib/gemini.ts`, `src/lib/types.ts`, `src/app/page.tsx`, `src/app/scan/page.tsx`, `src/app/settings/page.tsx`
+* **?��??��?**�?  * **InBody AI 輔助?��?說�?**：在上傳?�?��??�新增�?字說???�註輸入框�??�填）�?讓使?�者可?��??�截?��?補足?�景資�?（�?檢測?��??�身高�??�傷水腫?�別?�註）。更??`POST /api/inbody` ??Gemini Prompt，�?�?AI 將使?�者輸?��??��?作為?�鍵輔助?�考數?�進�?精確辨�??�解?��?  * **UI ?�本標�? (Version Badges)**：在?��??��??�面 Header（�???`?���??�路?�追蹤`?�InBody `??�?InBody ?��?`?��??�辨�?`?�� ?�照辨�?`?�設�?`?��? 設�?`）�?設�??�腳?��? `v1.2` 標籤，�?使用?�可?��?確�??��??�署?��??�新?�能上�??�?��?
+## ??�?變更?�目詳解
 
-## 2026/08/04 - v1.3 Mounjaro (GLP-1) 施打紀錄與 InBody 分析整合
-- **新增 GLP-1 藥物紀錄介面**：在 InBody 分析頁面加入快速紀錄按鈕（2.5mg, 5.0mg, 7.5mg），並自動同步至獨立 Notion Database。
-- **AI 解析強化**：在傳送 InBody 數據給 Gemini 解析時，將自動注入最近 5 次的 Mounjaro 施打紀錄，強制要求 AI 監測「除脂體重 (Lean Body Mass)」流失情況，以防範 GLP-1 副作用引發之肌少症。
-- **修正 InBody 備註解析錯誤**：調整 AI Prompt，使其在辨識截圖遺漏數值時，優先採用使用者提供的備註說明，不再強制回傳 null。
-
-此檔案記錄本次 Food Calories Tracker 專案所有針對 UI 視覺品質、資料讀取流暢性與延伸功能的優化歷程。
-
-## 🚀 v1.2 InBody AI 輔助文字說明與 UI 版本標示功能（2026-07-26）
-* **檔案**：`src/app/inbody/page.tsx`, `src/app/api/inbody/route.ts`, `src/lib/gemini.ts`, `src/lib/types.ts`, `src/app/page.tsx`, `src/app/scan/page.tsx`, `src/app/settings/page.tsx`
-* **優化做法**：
-  * **InBody AI 輔助文字說明**：在上傳區域下方新增文字說明/備註輸入框（選填），讓使用者可於上傳截圖時補足背景資訊（如檢測日期、身高或受傷水腫特別備註）。更新 `POST /api/inbody` 與 Gemini Prompt，引導 AI 將使用者輸入的文字作為關鍵輔助參考數據進行精確辨識與解析。
-  * **UI 版本標記 (Version Badges)**：在全站核心頁面 Header（首頁 `🍽️ 卡路里追蹤`、InBody `🏋️ InBody 分析`、拍照辨識 `📸 拍照辨識`、設定 `⚙️ 設定`）與設定頁腳新增 `v1.2` 標籤，讓使用者可直觀確認當前部署版號與新功能上線狀態。
-
-## 🛠️ 變更項目詳解
-
-### 1. 拍照分析後的備註欄位不足與歷史回溯
-* **檔案**：`src/app/scan/confirm/page.tsx` & `src/app/history/page.tsx`
-* **優化做法**：
-  * 將確認頁面文字區域改設為 `min-height: 160px`。
-  * 讓記錄編輯器整合 `note` 字串接口。
-
-### 2. InBody 排版間隙與底部截斷修正
-* **檔案**：`src/components/InBodyVisuals.tsx`
-* **優化做法**：
-  * 將下方左右腿數據區從緊貼邊緣移開至中央（`16px` 空間）。
-  * 升高至 `bottom: 12px`，終止容器裁剪重疊。
-
-### 3. 彈窗滑動阻力移除
-* **檔案**：`src/components/InBodyModal.tsx`
-* **優化做法**：
-  * 放棄全螢幕 `min-height` 特效，還原流暢捲動。
-
-### 4. 「常用餐點」重組與刪除指令
-* **檔案**：`src/app/search/page.tsx` & `confirm/page.tsx`
-* **優化做法**：
-  * 取消舊版「我的最愛」，置換成包含 ✕ 按鈕的靈活標籤結構。
-
+### 1. ?�照?��?後�??�註欄�?不足?�歷?��?�?* **檔�?**：`src/app/scan/confirm/page.tsx` & `src/app/history/page.tsx`
+* **?��??��?**�?  * 將確認�??��?字�??�改設為 `min-height: 160px`??  * 讓�??�編輯器?��? `note` 字串?�口??
+### 2. InBody ?��??��??��??�截?�修�?* **檔�?**：`src/components/InBodyVisuals.tsx`
+* **?��??��?**�?  * 將�??�左?�腿?��??�從�?貼�?�?��?�至中央（`16px` 空�?）�?  * ?��???`bottom: 12px`，�?止容?��??��??��?
+### 3. 彈�?滑�??��?移除
+* **檔�?**：`src/components/InBodyModal.tsx`
+* **?��??��?**�?  * ?��??�螢�?`min-height` ?��?，�??��??�捲?��?
+### 4. ?�常?��?點」�?組�??�除?�令
+* **檔�?**：`src/app/search/page.tsx` & `confirm/page.tsx`
+* **?��??��?**�?  * ?��??��??��??��??�」�?置�??��??????��??��?活�?籤�?構�?
 ---
 
-## 💡 關於「常用餐點」存儲架構建議與反饋
+## ?�� ?�於?�常?��?點」�??�架構建議�??��?
 
-**建議維持本地存儲原因：**
-1. **Vercel 部署限制**：Node 執行階段之物理檔案無法保存跨階段數據。
-2. **回應敏捷性**：避免 Notion API 在初始化時造成的負載阻塞。
-
+**建議維�??�地存儲?��?�?*
+1. **Vercel ?�署?�制**：Node ?��??�段之物?��?案無法�?存跨?�段?��???2. **?��??�捷??*：避??Notion API ?��?始�??�造�??��?載阻塞�?
 ---
 
-## 🚀 v0.9 綜合品質優化（2026-05-01）
-
-基於實機（iPhone 15 Pro Max）使用回饋與完整源碼審查，進行 10 項改進。
-
-### 1. Next.js 16 viewport 元標籤修正
-* **檔案**：`src/app/layout.tsx`
-* **做法**：將棄用的 `metadata.viewport` 分離為 `export const viewport: Viewport`，消除 build 警告，確保 iPhone 正確禁止雙指縮放。
-
-### 2. Notion API TTL 快取策略
-* **檔案**：`src/lib/store.ts`、`src/lib/useRecords.ts`
-* **做法**：在 Zustand Store 加入 `recordsLoadedAt` 時間戳與 `isRecordsCacheValid()` 方法（TTL 30 秒）。`useRecords` 改為快取未失效時直接使用本地資料，不重複請求 Notion，大幅提升頁面切換速度。
-
-### 3. 品項明細 JSON 安全截斷
-* **檔案**：`src/lib/notion.ts`
-* **做法**：新增 `serializeItems()` 函式，先壓縮非核心欄位（confidence、portion），若仍超 2000 字元則逐一移除末尾品項，確保儲存的 JSON 永遠合法可解析，杜絕靜默資料損壞。
-
-### 4. SVG filter ID 衝突修正
-* **檔案**：`src/components/InBodyVisuals.tsx`
-* **做法**：`HeatmapBody` 新增 `filterId` prop，`SegmentalDiagram` 基於 `label` 生成唯一 ID（如 `heatGlow-----`），解決同頁兩個分析圖共用 filter 的 DOM ID 衝突。
-
-### 5. Dark Mode FloatingCard 白底修正
-* **檔案**：`src/components/InBodyVisuals.tsx`
-* **做法**：將 `background: "rgba(255,255,255,0.7)"` 改為 `background: "var(--color-bg-card)"`，Dark Mode 下卡片背景正確跟隨主題色。
-
-### 6. 底部導覽列精簡（7→6 項）
-* **檔案**：`src/components/BottomNav.tsx`、`src/app/page.tsx`
-* **做法**：從底部導覽列移除「設定」，改在首頁右上角加入 ⚙️ 圓形捷徑按鈕，每個 nav 項目觸控熱區更寬敞。
-
-### 7. Zustand Store 型別強化與功能補全
-* **檔案**：`src/lib/store.ts`
-* **做法**：以具體的 `FavoriteItem` interface 取代 `any[]`；新增 `updateFoodOptimistic()` action（之前只有 add/remove，缺少 update）；移除所有 `any` 型別。
-
-### 8. useRecords 與 Zustand 架構統一
-* **檔案**：`src/lib/useRecords.ts`
-* **做法**：`useRecords()` 完全基於 `useAppStore` 運作，暴露 `updateFoodOptimistic` 等 optimistic helpers，架構不再雙軌分離。
-
-### 9. EXIF 時區動態偵測
-* **檔案**：`src/app/scan/page.tsx`
-* **做法**：改用 `Intl.DateTimeFormat().resolvedOptions().timeZone` 取得使用者的系統時區，取代硬編碼 `Asia/Taipei`。
-
-### 10. 歷史記錄營養素數值可編輯
-* **檔案**：`src/app/history/page.tsx`
-* **做法**：在歷史編輯 Modal 中新增熱量、蛋白質、碳水、脂肪、膳食纖維五個數字輸入欄，儲存時同步更新至 Notion，解決 AI 估算錯誤無法手動校正的問題。
-
+## ?? v0.9 綜�??�質?��?�?026-05-01�?
+?�於實�?（iPhone 15 Pro Max）使?��?饋�?完整源碼審查，進�? 10 ?�改?��?
+### 1. Next.js 16 viewport ?��?籤修�?* **檔�?**：`src/app/layout.tsx`
+* **?��?**：�?棄用??`metadata.viewport` ?�離??`export const viewport: Viewport`，�???build 警�?，確�?iPhone �?��禁止?��?縮放??
+### 2. Notion API TTL 快�?策略
+* **檔�?**：`src/lib/store.ts`?�`src/lib/useRecords.ts`
+* **?��?**：在 Zustand Store ?�入 `recordsLoadedAt` ?��??��? `isRecordsCacheValid()` ?��?（TTL 30 秒�??�`useRecords` ?�為快�??�失?��??�接使用?�地資�?，�??��?請�? Notion，大幅�??��??��??�速度??
+### 3. ?��??�細 JSON 安全?�斷
+* **檔�?**：`src/lib/notion.ts`
+* **?��?**：新�?`serializeItems()` ?��?，�?壓縮?�核心�?位�?confidence?�portion）�??��?�?2000 字�??�逐�?移除?�尾?��?，確保儲存�? JSON 永�??��??�解?��??��??��?資�??��???
+### 4. SVG filter ID 衝�?修正
+* **檔�?**：`src/components/InBodyVisuals.tsx`
+* **?��?**：`HeatmapBody` ?��? `filterId` prop，`SegmentalDiagram` ?�於 `label` ?��??��? ID（�? `heatGlow-----`）�?�?��?��??�個�??��??�用 filter ??DOM ID 衝�???
+### 5. Dark Mode FloatingCard ?��?修正
+* **檔�?**：`src/components/InBodyVisuals.tsx`
+* **?��?**：�? `background: "rgba(255,255,255,0.7)"` ?�為 `background: "var(--color-bg-card)"`，Dark Mode 下卡?��??�正確�??�主題色??
+### 6. 底部導覽?�精簡�?7?? ?��?
+* **檔�?**：`src/components/BottomNav.tsx`?�`src/app/page.tsx`
+* **?��?**：�?底部導覽?�移?�「設定」�??�在首�??��?角�????��? ?�形?��??��?，�???nav ?�目觸控?��??�寬?��?
+### 7. Zustand Store ?�別強�??��??��???* **檔�?**：`src/lib/store.ts`
+* **?��?**：以?��???`FavoriteItem` interface ?�代 `any[]`；新�?`updateFoodOptimistic()` action（�??�只??add/remove，缺�?update）�?移除?�??`any` ?�別??
+### 8. useRecords ??Zustand ?��?統�?
+* **檔�?**：`src/lib/useRecords.ts`
+* **?��?**：`useRecords()` 完全?�於 `useAppStore` ?��?，暴??`updateFoodOptimistic` �?optimistic helpers，架構�??��?軌�??��?
+### 9. EXIF ?��??��??�測
+* **檔�?**：`src/app/scan/page.tsx`
+* **?��?**：改??`Intl.DateTimeFormat().resolvedOptions().timeZone` ?��?使用?��?系統?��?，�?�?��編碼 `Asia/Taipei`??
+### 10. 歷史記�??��?素數?�可編輯
+* **檔�?**：`src/app/history/page.tsx`
+* **?��?**：在歷史編輯 Modal 中新增熱?�、�??�質?�碳水、�??�、膳食�?維�??�數字輸?��?，儲存�??�步?�新??Notion，解�?AI 估�??�誤?��??��??�正?��?題�?
 ---
 
-## 🚀 v1.1 餐前與餐後照片比對估算實際攝取量 (2026-07-19)
+## ?? v1.1 餐�??��?後照?��?對估算實?��??��? (2026-07-19)
 
-為了解決使用者「不會整份吃完，依照單張照片估算卡路里過高」的痛點，新增「餐前與餐後照片比對分析」功能。
+?��?�?��使用?�「�??�整份�?完�?依照?�張?��?估�??�路?��?高」�??��?，新增「�??��?餐�??��?比�??��??��??��?
+### 1. ?��?比�??��?辨�?機制 (Before & After Comparison)
+* **檔�?**：`src/lib/gemini.ts`
+* **?��?**�?  * ?��? `buildBeforeAfterFoodPrompt()` ?��?，建立�?�?Prompt?��?�?AI 比�?餐�??��??��?後剩餘照?��?精估每種食物?�實?��??��??��?�?(portion consumed)?��?  * 估�??�卡路�??��??�質?�碳水、�??�、膳食�?維�??�【實?��??��??��?並�??��?比�?細�??�未食用完�?食物?�?�寫??`note` ?�註中�?  * `analyzeFood` ?��??�援 `scanMode: "before_after"` ??`afterImageBase64` ?�數，自?�走 Fallback 策略?��?多模?��?�?API Key ?�呼?��?試�?
+### 2. ?��??�照上傳??UI ?��? (Neumorphism UI Adjustments)
+* **檔�?**：`src/app/scan/page.tsx`
+* **?��?**�?  * ?��??�單張照?�」�??��???餐�?比�??��??��??��? (Tabs)??  * ?��??��?上傳?�?��??�援?��??��??��?（�??��?餐�??��??��?）�?並�?供精美�??��??�覽框�?  * 強�?載入/?��?中�??��??�單?��??��?模�?下�?供優?��??��?載入?�示??  * 串接 `/api/analyze` 路由將�???餐�??��??��?轉為 base64 ?��?後端??
+### 3. 確�??�面?��?辨�??�示?�儲存優??* **檔�?**：`src/app/scan/confirm/page.tsx`
+* **?��?**�?  * ?��? `sessionStorage` ?��? `scanMode` ?�數??  * ??`/scan/confirm` ?�面?�端?�入專屬?�示 Banner，�?確�??�使?�者「已使用餐�??��?後照?��?對�??��?以�??�值為實�??��??�」�?
+- v1.4: ?��? Mounjaro 互�?式日?�追蹤、長?�刪?��??�、修�?Notion 欄�?空白字�??��?
 
-### 1. 雙圖比對核心辨識機制 (Before & After Comparison)
-* **檔案**：`src/lib/gemini.ts`
-* **做法**：
-  * 新增 `buildBeforeAfterFoodPrompt()` 方法，建立專屬 Prompt。引導 AI 比對餐前照片與餐後剩餘照片，精估每種食物「實際吃掉的百分比 (portion consumed)」。
-  * 估算的卡路里、蛋白質、碳水、脂肪、膳食纖維皆為【實際攝取量】，並將雙圖比對細節與未食用完的食物狀態寫入 `note` 備註中。
-  * `analyzeFood` 擴展支援 `scanMode: "before_after"` 與 `afterImageBase64` 參數，自動走 Fallback 策略進行多模型與多 API Key 的呼叫嘗試。
-
-### 2. 雙圖拍照上傳與 UI 優化 (Neumorphism UI Adjustments)
-* **檔案**：`src/app/scan/page.tsx`
-* **做法**：
-  * 新增「單張照片」與「餐前/餐後比對」分頁式切換 (Tabs)。
-  * 重構圖片上傳區域，支援雙區獨立選擇（餐前與餐後剩餘照片），並提供精美的雙圖預覽框。
-  * 強化載入/分析中狀態，在單圖及雙圖模式下提供優雅的動態載入提示。
-  * 串接 `/api/analyze` 路由將餐前/餐後照片同時轉為 base64 送往後端。
-
-### 3. 確認頁面雙圖辨識提示與儲存優化
-* **檔案**：`src/app/scan/confirm/page.tsx`
-* **做法**：
-  * 透過 `sessionStorage` 傳遞 `scanMode` 參數。
-  * 在 `/scan/confirm` 頁面頂端加入專屬提示 Banner，明確提醒使用者「已使用餐前與餐後照片比對分析，以下數值為實際攝取量」。
-
-- v1.4: 新增 Mounjaro 互動式日曆追蹤、長按刪除功能、修復 Notion 欄位空白字元問題

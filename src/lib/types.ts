@@ -2,7 +2,7 @@
 // 食物辨識相關型別與版本號
 // ==========================================
 
-export const APP_VERSION = "v1.4";
+export const APP_VERSION = "v1.5";
 
 /** 單一食物品項 */
 export interface FoodItem {
@@ -347,8 +347,9 @@ export interface DietAnalysis {
   summary: string;
   /** 熱量攝取評估 */
   calorieAssessment: string;
-  /** 巨量營養素比例評估 */
   macroAssessment: string;
+  /** 針對 GLP-1 施打狀況的多維度評估與影響分析 */
+  mounjaroAssessment?: string;
   /** 飲食優點 */
   strengths: string[];
   /** 需注意事項 */

@@ -308,7 +308,7 @@ export default function StatsPage() {
           {/* AI Diet Analysis */}
           <div className="card" style={{ marginBottom: "var(--spacing-lg)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--spacing-md)" }}>
-              <h3 style={{ fontSize: "1rem", fontWeight: 600 }}>🤖 AI 飲食建議</h3>
+              <h3 style={{ fontSize: "1rem", fontWeight: 600 }}>🤖 AI 分析建議</h3>
               <button
                 className={`btn btn-sm ${analysisLoading ? "" : "btn-secondary"}`}
                 onClick={handleRefreshAnalysis}
@@ -344,6 +344,12 @@ export default function StatsPage() {
                 <div className="card-inset" style={{ padding: "var(--spacing-md)" }}>
                   <div style={{ fontSize: "0.85rem", lineHeight: 1.6 }}>{dietAnalysis.summary}</div>
                 </div>
+                {dietAnalysis.mounjaroAssessment && (
+                  <div>
+                    <div style={{ fontSize: "0.8rem", fontWeight: 600, marginBottom: "var(--spacing-xs)" }}>💉 GLP-1 綜合評估</div>
+                    <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.6 }}>{dietAnalysis.mounjaroAssessment}</div>
+                  </div>
+                )}
                 <div>
                   <div style={{ fontSize: "0.8rem", fontWeight: 600, marginBottom: "var(--spacing-xs)" }}>🔥 熱量評估</div>
                   <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.6 }}>{dietAnalysis.calorieAssessment}</div>

@@ -514,7 +514,7 @@ export async function appendAdviceToInBodyPage(pageId: string, markdownText: str
       {
         object: 'block',
         type: 'heading_2',
-        heading_2: { rich_text: [{ type: 'text', text: { content: `🤖 AI 飲食建議 (${new Date().toLocaleDateString('zh-TW')})` } }] }
+        heading_2: { rich_text: [{ type: 'text', text: { content: `🤖 AI 分析建議 (${new Date().toLocaleDateString('zh-TW')})` } }] }
       },
       ...blocks,
       {

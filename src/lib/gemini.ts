@@ -451,10 +451,11 @@ export async function analyzeInBody(
 function buildDietAnalysisPrompt(
   inbodyJson: string,
   foodRecordsJson: string,
+  mounjaroRecordsJson: string,
   period: '7days' | '30days'
 ): string {
   const periodLabel = period === '7days' ? '近 7 天' : '近 30 天';
-  return `你是一位專業營養師。以下是使用者最新的 InBody 身體組成數據，以及${periodLabel}的飲食紀錄。請根據這些資料做交叉分析，給出專業的飲食建議。
+  return `你是一位專業營養師與代謝體態管理顧問。以下是使用者最新的 InBody 身體組成數據、${periodLabel}的飲食紀錄，以及最近的 GLP-1 (Mounjaro 猛健樂) 施打紀錄。請根據這些資料做多維度交叉分析，給出專業的分析建議。
 
 ## 使用者 InBody 數據
 ${inbodyJson}
@@ -462,11 +463,15 @@ ${inbodyJson}
 ## ${periodLabel}飲食紀錄
 ${foodRecordsJson}
 
+## 近期 GLP-1 (Mounjaro) 施打紀錄
+${mounjaroRecordsJson}
+
 ## 回傳格式
 請嚴格以 JSON 回傳：
 {
   "period": "${period}",
-  "summary": "一段簡潔的飲食總結 (2-3 句話)",
+  "summary": "一段簡潔的綜合總結 (2-3 句話)",
+  "mounjaroAssessment": "針對 GLP-1 施打劑量與頻率、伴隨的體重/肌肉流失狀況、以及近期食慾與熱量缺口，提出多維度的關聯分析",
   "calorieAssessment": "針對熱量攝取與 InBody 建議熱量的對比評估",
   "macroAssessment": "蛋白質/碳水/脂肪的比例是否適當的評估",
   "strengths": ["飲食優點1", "飲食優點2"],
@@ -475,13 +480,14 @@ ${foodRecordsJson}
 }
 
 ## 分析要點
-1. **熱量對比**：實際平均攝取 vs InBody 建議的每日攝取熱量，差距是否合理
-2. **蛋白質攝取**：根據體重和骨骼肌重，計算每公斤體重蛋白質攝取量，是否達到 1.2-1.6g/kg 建議範圍
-3. **脂肪攝取**：體脂率偏高時，脂肪攝取比例是否仍然過高
-4. **膳食纖維**：是否達到每日 25g 的建議量
-5. **飲食均衡**：是否有營養素明顯不足或過量
-6. **具體可行建議**：建議需要具體且可操作（例如「每餐增加一份拳頭大小的蛋白質」而非「多吃蛋白質」）
-7. 如飲食紀錄不足 3 天，在 summary 中提醒數據量可能不足以做出精準分析
+1. **GLP-1 用藥影響分析**：交給 AI 依據數據自由發揮多維度分析，例如觀察用藥頻率/劑量是否導致食慾大幅下降、熱量缺口是否過大，以及伴隨的體重與「除脂體重 (肌肉)」流失比例是否健康。
+2. **熱量對比**：實際平均攝取 vs InBody 建議的每日攝取熱量，差距是否合理
+3. **蛋白質攝取**：根據體重和骨骼肌重，計算每公斤體重蛋白質攝取量，是否達到 1.2-1.6g/kg 建議範圍，特別是在 GLP-1 減重期間以預防肌少症
+4. **脂肪攝取**：體脂率偏高時，脂肪攝取比例是否仍然過高
+5. **膳食纖維**：是否達到每日 25g 的建議量
+6. **飲食均衡**：是否有營養素明顯不足或過量
+7. **具體可行建議**：建議需要具體且可操作（例如「每餐增加一份拳頭大小的蛋白質」而非「多吃蛋白質」）
+8. 如飲食紀錄不足 3 天，在 summary 中提醒數據量可能不足以做出精準分析
 
 回傳純 JSON，不要有任何其他文字`;
 }
@@ -490,6 +496,7 @@ ${foodRecordsJson}
 export async function analyzeDiet(
   inbodyData: InBodyData,
   foodRecords: FoodRecord[],
+  mounjaroRecords: any[],
   period: '7days' | '30days'
 ): Promise<DietAnalysis> {
   const apiKeyString = process.env.GEMINI_API_KEY;
@@ -510,9 +517,14 @@ export async function analyzeDiet(
     source: r.source,
   }));
 
+  const mRecordsStr = mounjaroRecords.length > 0 
+    ? JSON.stringify(mounjaroRecords.map(r => ({ Date: r.date, Dose: `${r.dose}mg` })))
+    : "無紀錄";
+
   const prompt = buildDietAnalysisPrompt(
     JSON.stringify(inbodyData),
     JSON.stringify(simplifiedRecords),
+    mRecordsStr,
     period
   );
 
