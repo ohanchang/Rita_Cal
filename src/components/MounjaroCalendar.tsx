@@ -20,46 +20,10 @@ export default function MounjaroCalendar({ records, onAddRecord, onDeleteRecord,
   const [showDoseModal, setShowDoseModal] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState<MounjaroRecord | null>(null);
 
-  // Long press handling
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  
-  const handleTouchStart = (e: React.TouchEvent | React.MouseEvent, record: MounjaroRecord | undefined, date: Date) => {
-    // 只有在有紀錄時，才啟動長按刪除的計時器
-    if (record) {
-      timerRef.current = setTimeout(() => {
-        setRecordToDelete(record);
-        timerRef.current = null;
-      }, 500);
-    }
+  const handleDateClick = (date: Date) => {
+    setSelectedDate(date);
+    setShowDoseModal(true);
   };
-
-  const handleTouchEnd = (e: React.TouchEvent | React.MouseEvent, record: MounjaroRecord | undefined, date: Date) => {
-    if (record) {
-      // 若有紀錄且計時器還在 (短按)，打開劑量選單
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-        timerRef.current = null;
-        setSelectedDate(date);
-        setShowDoseModal(true);
-      }
-    } else {
-      // 若沒有紀錄，短按直接打開劑量選單以進行新增
-      setSelectedDate(date);
-      setShowDoseModal(true);
-    }
-    // 防止 iOS Ghost Clicks
-    if (e.type === 'touchend' && e.cancelable) {
-      e.preventDefault();
-    }
-  };
-
-  const handleTouchMove = () => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-  };
-
   const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
   const prevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
 
@@ -113,12 +77,7 @@ export default function MounjaroCalendar({ records, onAddRecord, onDeleteRecord,
           return (
             <div
               key={day.toISOString()}
-              onMouseDown={(e) => handleTouchStart(e, record, day)}
-              onMouseUp={(e) => handleTouchEnd(e, record, day)}
-              onMouseLeave={handleTouchMove}
-              onTouchStart={(e) => handleTouchStart(e, record, day)}
-              onTouchEnd={(e) => handleTouchEnd(e, record, day)}
-              onTouchMove={handleTouchMove}
+              onClick={() => handleDateClick(day)}
               style={{
                 aspectRatio: "1",
                 display: "flex",
@@ -149,58 +108,50 @@ export default function MounjaroCalendar({ records, onAddRecord, onDeleteRecord,
 
       {/* Select Dose Modal */}
       {showDoseModal && selectedDate && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "var(--spacing-lg)" }} onClick={() => setShowDoseModal(false)}>
-          <div className="card" style={{ width: "100%", maxWidth: "350px" }} onClick={e => e.stopPropagation()}>
-            <h4 style={{ margin: "0 0 var(--spacing-md)", textAlign: "center" }}>
-              記錄 {format(selectedDate, "MM/dd")} 施打劑量
-            </h4>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "var(--spacing-sm)" }}>
-              {DOSES.map(d => (
-                <button
-                  key={d}
-                  className="btn"
-                  style={{ background: "rgba(108, 99, 255, 0.1)", color: "var(--color-primary)", border: "1px solid rgba(108, 99, 255, 0.2)", padding: "12px 0" }}
-                  onClick={() => handleDoseSelect(d)}
-                >
-                  {d}mg
-                </button>
-              ))}
+        (() => {
+          const dateStr = format(selectedDate, "yyyy-MM-dd");
+          const existingRecord = records.find(r => r.date === dateStr);
+          
+          return (
+            <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "var(--spacing-lg)" }} onClick={() => setShowDoseModal(false)}>
+              <div className="card" style={{ width: "100%", maxWidth: "350px" }} onClick={e => e.stopPropagation()}>
+                <h4 style={{ margin: "0 0 var(--spacing-md)", textAlign: "center" }}>
+                  記錄 {format(selectedDate, "MM/dd")} 施打劑量
+                </h4>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "var(--spacing-sm)" }}>
+                  {DOSES.map(d => (
+                    <button
+                      key={d}
+                      className="btn"
+                      style={{ background: "rgba(108, 99, 255, 0.1)", color: "var(--color-primary)", border: "1px solid rgba(108, 99, 255, 0.2)", padding: "12px 0" }}
+                      onClick={() => handleDoseSelect(d)}
+                    >
+                      {d}mg
+                    </button>
+                  ))}
+                </div>
+                <div style={{ display: "flex", gap: "var(--spacing-sm)", marginTop: "var(--spacing-md)" }}>
+                  <button className="btn" style={{ flex: 1, background: "var(--color-bg-input)", border: "none" }} onClick={() => setShowDoseModal(false)}>
+                    取消
+                  </button>
+                  {existingRecord && (
+                    <button
+                      className="btn"
+                      style={{ flex: 1, background: "rgba(225, 112, 85, 0.1)", color: "var(--color-danger)", border: "1px solid rgba(225, 112, 85, 0.2)" }}
+                      onClick={() => {
+                        onDeleteRecord(existingRecord.id);
+                        setShowDoseModal(false);
+                      }}
+                    >
+                      <Trash2 size={16} style={{ marginRight: "4px" }} />
+                      刪除
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
-            <button className="btn" style={{ width: "100%", marginTop: "var(--spacing-md)", background: "var(--color-bg-input)", border: "none" }} onClick={() => setShowDoseModal(false)}>
-              取消
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Confirm Modal */}
-      {recordToDelete && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "var(--spacing-lg)" }} onClick={() => setRecordToDelete(null)}>
-          <div className="card" style={{ width: "100%", maxWidth: "300px" }} onClick={e => e.stopPropagation()}>
-            <h4 style={{ margin: "0 0 var(--spacing-sm)", color: "var(--color-danger)", display: "flex", alignItems: "center", gap: 6 }}>
-              <Trash2 size={18} />
-              刪除紀錄
-            </h4>
-            <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", marginBottom: "var(--spacing-md)" }}>
-              確定要刪除 {recordToDelete.date} ({recordToDelete.dose}mg) 的紀錄嗎？
-            </p>
-            <div style={{ display: "flex", gap: "var(--spacing-sm)" }}>
-              <button className="btn" style={{ flex: 1, background: "var(--color-bg-input)", border: "none" }} onClick={() => setRecordToDelete(null)}>
-                取消
-              </button>
-              <button
-                className="btn"
-                style={{ flex: 1, background: "var(--color-danger)", color: "white" }}
-                onClick={() => {
-                  onDeleteRecord(recordToDelete.id);
-                  setRecordToDelete(null);
-                }}
-              >
-                刪除
-              </button>
-            </div>
-          </div>
-        </div>
+          );
+        })()
       )}
     </div>
   );
