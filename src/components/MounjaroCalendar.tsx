@@ -150,7 +150,7 @@ export default function MounjaroCalendar({ records, onAddRecord, onDeleteRecord,
       {/* Select Dose Modal */}
       {showDoseModal && selectedDate && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "flex-end", zIndex: 100 }} onClick={() => setShowDoseModal(false)}>
-          <div style={{ background: "var(--bg-card)", width: "100%", padding: "var(--spacing-lg)", borderTopLeftRadius: "var(--radius-lg)", borderTopRightRadius: "var(--radius-lg)" }} onClick={e => e.stopPropagation()}>
+          <div style={{ background: "var(--color-bg-card)", width: "100%", padding: "var(--spacing-lg)", borderTopLeftRadius: "var(--radius-lg)", borderTopRightRadius: "var(--radius-lg)" }} onClick={e => e.stopPropagation()}>
             <h4 style={{ margin: "0 0 var(--spacing-md)", textAlign: "center" }}>
               記錄 {format(selectedDate, "MM/dd")} 施打劑量
             </h4>
@@ -166,7 +166,7 @@ export default function MounjaroCalendar({ records, onAddRecord, onDeleteRecord,
                 </button>
               ))}
             </div>
-            <button className="btn" style={{ width: "100%", marginTop: "var(--spacing-md)", background: "var(--bg-secondary)" }} onClick={() => setShowDoseModal(false)}>
+            <button className="btn" style={{ width: "100%", marginTop: "var(--spacing-md)", background: "var(--color-bg-input)", border: "none" }} onClick={() => setShowDoseModal(false)}>
               取消
             </button>
           </div>
@@ -185,7 +185,7 @@ export default function MounjaroCalendar({ records, onAddRecord, onDeleteRecord,
               確定要刪除 {recordToDelete.date} ({recordToDelete.dose}mg) 的紀錄嗎？
             </p>
             <div style={{ display: "flex", gap: "var(--spacing-sm)" }}>
-              <button className="btn" style={{ flex: 1, background: "var(--bg-secondary)" }} onClick={() => setRecordToDelete(null)}>
+              <button className="btn" style={{ flex: 1, background: "var(--color-bg-input)", border: "none" }} onClick={() => setRecordToDelete(null)}>
                 取消
               </button>
               <button
