@@ -149,8 +149,8 @@ export default function MounjaroCalendar({ records, onAddRecord, onDeleteRecord,
 
       {/* Select Dose Modal */}
       {showDoseModal && selectedDate && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "flex-end", zIndex: 100 }} onClick={() => setShowDoseModal(false)}>
-          <div style={{ background: "var(--color-bg-card)", width: "100%", padding: "var(--spacing-lg)", borderTopLeftRadius: "var(--radius-lg)", borderTopRightRadius: "var(--radius-lg)" }} onClick={e => e.stopPropagation()}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "var(--spacing-lg)" }} onClick={() => setShowDoseModal(false)}>
+          <div className="card" style={{ width: "100%", maxWidth: "350px" }} onClick={e => e.stopPropagation()}>
             <h4 style={{ margin: "0 0 var(--spacing-md)", textAlign: "center" }}>
               記錄 {format(selectedDate, "MM/dd")} 施打劑量
             </h4>
@@ -175,7 +175,7 @@ export default function MounjaroCalendar({ records, onAddRecord, onDeleteRecord,
 
       {/* Delete Confirm Modal */}
       {recordToDelete && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: "var(--spacing-lg)" }} onClick={() => setRecordToDelete(null)}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "var(--spacing-lg)" }} onClick={() => setRecordToDelete(null)}>
           <div className="card" style={{ width: "100%", maxWidth: "300px" }} onClick={e => e.stopPropagation()}>
             <h4 style={{ margin: "0 0 var(--spacing-sm)", color: "var(--color-danger)", display: "flex", alignItems: "center", gap: 6 }}>
               <Trash2 size={18} />
