@@ -18,12 +18,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: '請指定 period (7days/30days)' }, { status: 400 });
     }
 
-    // 取得最新 InBody 紀錄
+    // 取得近 5 筆 InBody 紀錄 (已按日期降序排列)
     const inbodyRecords = await getAllInBodyRecords();
     if (inbodyRecords.length === 0) {
       return NextResponse.json({ success: false, error: '尚無 InBody 紀錄，請先上傳 InBody 數據' }, { status: 400 });
     }
-    const latestInBody = inbodyRecords[0]; // 已按日期降序排列
+    const recentInBodyRecords = inbodyRecords.slice(0, 5);
+    const latestInBody = inbodyRecords[0];
 
     // 取得近 N 天飲食記錄
     const allFoodRecords = await getAllFoodRecords();
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
     const recentMRecords = mRecords.slice(0, 10);
 
     // 呼叫 Gemini 做多維度交叉分析
-    const analysis = await analyzeDiet(latestInBody, recentRecords, recentMRecords, period);
+    const analysis = await analyzeDiet(recentInBodyRecords, recentRecords, recentMRecords, period);
 
     // 背景寫入 Notion (Fire and forget)
     // 我們將 AI 分析報告儲存在最新一筆 InBody 紀錄的頁面 Block 內
