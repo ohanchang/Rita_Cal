@@ -24,28 +24,30 @@ export default function MounjaroCalendar({ records, onAddRecord, onDeleteRecord,
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   
   const handleTouchStart = (e: React.TouchEvent | React.MouseEvent, record: MounjaroRecord | undefined, date: Date) => {
-    // If no record, just standard click to add
-    if (!record) return;
-    
-    // Start long press timer
-    timerRef.current = setTimeout(() => {
-      setRecordToDelete(record);
-      timerRef.current = null;
-    }, 500);
+    // 只有在有紀錄時，才啟動長按刪除的計時器
+    if (record) {
+      timerRef.current = setTimeout(() => {
+        setRecordToDelete(record);
+        timerRef.current = null;
+      }, 500);
+    }
   };
 
   const handleTouchEnd = (e: React.TouchEvent | React.MouseEvent, record: MounjaroRecord | undefined, date: Date) => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-      // It was a short press. But we only show Dose modal if they want to override? 
-      // Actually, if it has a record, maybe click shouldn't do anything or just allow overriding.
-      // Let's say if they short press, they can still open the modal to change/add a new one, 
-      // or we just prevent it if there's already one? Let's allow overriding (they might have typed wrong dose).
+    if (record) {
+      // 若有紀錄且計時器還在 (短按)，打開劑量選單
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+        setSelectedDate(date);
+        setShowDoseModal(true);
+      }
+    } else {
+      // 若沒有紀錄，短按直接打開劑量選單以進行新增
       setSelectedDate(date);
       setShowDoseModal(true);
     }
-    // Prevent default to avoid iOS ghost clicks if using touch
+    // 防止 iOS Ghost Clicks
     if (e.type === 'touchend' && e.cancelable) {
       e.preventDefault();
     }
