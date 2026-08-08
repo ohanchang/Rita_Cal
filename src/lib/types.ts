@@ -2,7 +2,7 @@
 // 食物辨識相關型別與版本號
 // ==========================================
 
-export const APP_VERSION = "v1.6";
+export const APP_VERSION = "v1.6.1";
 
 /** 單一食物品項 */
 export interface FoodItem {
